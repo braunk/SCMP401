@@ -1,2 +1,3 @@
 # SCMP401
-yooooooooo
+
+My repository for my Spring 2018 SCMP senior seminar
