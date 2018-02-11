@@ -6,4 +6,6 @@ I met with Skon on Wednesday to discuss specifics of the project. I've attached 
 * What sort of queries need to be performed and in what way can I figure out how this queries interact and optimize search results to minimize querying repetition
 * How to **only** access the solar panel data, now that I am aware that it sits on the same database table as an abundance of irrelavent data
 * Research more about caching (this is a topic that I have never worked with before) and new tables for site specific data
-**IN PROGESS**
+
+As of Sunday, Professor Skon has still not been able to get me access to the database, or a subset of the database, due to being out-of-state. Hopefully I will have it by tomorrow Monday, February 12th. For now, I have done some research on MySQL Query Cache feature.
+The MySQL Query Cache's effectiveness is very dependent on the type of data and queries being performed. For example, databases that are constantly being updated, such as databases with a time-element, for the most part it is counterproductive to cache the queries performed on that database, since the results from the previous queries will all but outdated. Because the database I will be managing is clearly being updated frequently, I will need to research how to still minimize querying time using caching. I believe this will involve using automatically updating subtables.
