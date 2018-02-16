@@ -49,3 +49,31 @@ try {
     return EXIT_FAILURE;
   }
 ```
+## Week 2/12
+This week I got access to the database and I have been exploring the layout as well as setting up a plan for the upcoming weeks. As well as exchanging emails with Skon,
+I also met with him on Friday to discuss what interface was best to interact with the database. Note from that meeting can be found [here]().
+
+To access the database, I log onto the cslab.kenyon.edu server, then from the command line enter
+"mysql -u braunk -h cs3.kenyon.edu -p" (since the database is on the cs3.kenyon.edu server I will
+have to access it remotely). The name of the database is "LIM-SERV" and the table is "answers".
+I also can access it from a C++ file (as shown below):
+```{cpp}
+```
+Professor Skon also sent me a PHP function that has the info on the sites. Each site is laid out as
+site(Site name, Maximum watts, number of banks, list of ID's for each bank):
+```{php}
+function initSites() {
+    $ListOfSites[] = new site("Log Cabins",  1500, 2, ["A43C8B0C4A", "A43C8B0CD7"]);
+    $ListOfSites[] = new site("St. Andrews Primary", 1500, 2, ["A43C8B0AB1","A43CE7BE69"]);
+    $ListOfSites[] = new site("Victorious Nazarene", 800, 2, ["A43C6DC4D2","A43CE7BE5E"]);
+    $ListOfSites[] = new site("Kings College", 800, 1, ["A43C6DC5EB"]);
+    $ListOfSites[] = new site("Toledo Christian Academy", 800, 1, ["A43C895C02"]);
+    $ListOfSites[] = new site("San Antonio Primary", 1200, 1, ["A43C6DC815"]);
+    $ListOfSites[] = new site("Faith Nazarene", 1200, 1, ["A43CE7BE78"]);
+    $ListOfSites[] = new site("Sarteneja Nazarene", 1200, 1, ["A43C6DC4C6"]);
+    $ListOfSites[] = new site("Corazol Methodist", 1200, 1, ["A43CE7C04F"]);
+    $ListOfSites[] = new site("ACES", 1500, 2, ["A43C8B0C4A","A43C8B0B9F"]);
+    $ListOfSites[] = new site("Brighter Tomorrow", 600, 1, ["A43CE7BE41"]);
+    $ListOfSites[] = new site("Kenyon Solar Demo", 600, 1, ["A43C6DC810"]);
+    return $ListOfSites;
+```
