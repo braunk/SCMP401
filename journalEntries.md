@@ -51,13 +51,93 @@ try {
 ```
 ## Week 2/12
 This week I got access to the database and I have been exploring the layout as well as setting up a plan for the upcoming weeks. As well as exchanging emails with Skon,
-I also met with him on Friday to discuss what interface was best to interact with the database. Note from that meeting can be found [here]().
+I also met with him on Friday to discuss what interface was best to interact with the database. Note from that meeting can be found [here](https://docs.google.com/document/d/1uGr8fhwKfpG0WXRNelPcNLwHv2UV3NFk50r5TFiK3vE/edit?usp=sharing).
 
 To access the database, I log onto the cslab.kenyon.edu server, then from the command line enter
 "mysql -u braunk -h cs3.kenyon.edu -p" (since the database is on the cs3.kenyon.edu server I will
-have to access it remotely). The name of the database is "LIM-SERV" and the table is "answers".
-I also can access it from a C++ file (as shown below):
+have to access it remotely). The name of the database is "LIM-SERV" ("USE LIM-SERV") and the table is "answers".
+I also can access it from a C++ file, which I am currently working on accomplishing.
+
+The program will include an .h file that declares a class called "site" which will hold several data
+points, like site name, site ID, number of banks, and watt limit, as well as declare public functions
+to interact/receive those data points. This .h file's declared functions will then be defined in a
+similarly named .cpp file. *This* .cpp file holds most of the meat of the program, as this is where
+the code connecting to the database and retrieving the data will be held. At the moment I am having
+some difficulties with data type conversion from C++ and SQL.
+
+Sites.h file is shown below:
 ```{cpp}
+#include <stdlib.h>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include "mysql_connection.h"
+#include "mysql_driver.h"
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
+
+
+#ifndef sites_H
+#define sites_H
+
+#define HOST "cs3.kenyon.edu"
+#define USER "braunk"
+#define DB "LIM-SERV"
+//password taken out for journal entry use
+#define PASS "*********************"
+
+using namespace std;
+
+class sites{
+ public:
+  site();
+  site(string sitename,double maxWatts,int numBanks,string ID);
+  //at first I only have one querying function set up that a user will type in a site ID and will get
+  //random queried information (not very useable atm, only trying to test connection right now)
+  string qByID(string ID);
+  string sitename, ID;
+  double maxWatts;
+  int numBanks;
+ private:
+  const string url=HOST;
+  const string user=USER;
+  const string database=DB;
+  const string pass=PASS;
+
+};
+
+#endif /* sites_H */
+```
+
+The corresponding **unfinished** cpp file is shown below:
+```{cpp}
+#include <vector>
+#include <iostream>
+#include "sites.h"
+
+
+sites:sites(){
+}
+string sites::qByID(string ID){
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+  stmt->excute("SELECT AVG(Response) AS AVG, HOUR(TimeStamp) as HOUR, DAYOFWEEK(TimeStamp) A\
+S DAY FROM `Answers` WHERE IID = '"+ID+"' AND QID = 'qWattsMin1' AND YEARWEEK (TimeS\
+tamp) = YEARWEEK( current_date -interval 1 week ) GROUP BY DAY, HOUR;");
+
+  std::auto_ptr< sql::ResultSet > res;
+
+//the trouble comes in here where I want to keep receiving all possible information but I am not sure how to do that/ how to continue to 
+//store it all in a string then maybe later I should parse it so that the format is more desirable for use in the front-end products??
+
 ```
 Professor Skon also sent me a PHP function that has the info on the sites. Each site is laid out as
 site(Site name, Maximum watts, number of banks, list of ID's for each bank):
