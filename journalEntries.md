@@ -1,6 +1,38 @@
 # Journal Entries 
 ## Week 2/19
-This week I've been focusing on my C++ connection code still. 
+This week I've been focusing on my C++ connection code still. I resolved last week's issue and I am storing all of the query results as one long string. This means that in the upcoming weeks I will need to write code that properly recognizes the seperate pieces of information in the string and formats it in a way that would be useful for Jensen's front-end work and Matt's analysis. I am thinking this will be a vector, but I am meeting with them next Tuesday to discuss some questions such as this. For now, I am using the string. The finished first-draft of the C++ sites file is shown below:
+```{cpp}
+#include <vector>
+#include <iostream>
+#include "sites.h"
+
+
+sites::sites(){
+}
+sites::sites(string name,double mxW,int nBanks,vector<string> IDs){
+  sitename=name;
+  maxWatts=mxW;
+  for(int i=0;i<IDs.size();i++){
+    bankIDs[i]=IDs[i];
+  }
+  numBanks=nBanks;
+}
+string sites::qByID(string bankID){
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+  std::auto_ptr< sql::ResultSet > res;
+  stmt->execute("SELECT AVG(Response) AS AVG, HOUR(TimeStamp) as HOUR, DAYOFWEEK(TimeStamp) AS DAY FROM `Answers` WHERE IID = 'A43CE7BE5E' AND QID = 'qWattsMin1' AND YEARWEEK (TimeStamp) =\
+ YEARWEEK( current_date -interval 1 week ) GROUP BY DAY, HOUR AS _message;");
+  while(res->next()){
+    results=results+res->getString("_message");
+  }
+  return results;
+}
+```
+Besides fixing the getString and result adding portion by naming the output of the query as "\_message" and later calling that to add to the results string, I also realized that the last element of ID's in the sites class should be a vector of bank ID's (since different sites have a varying number of banks). Unfortunately I still have a few minor issues in the code that I am working through at the moment and am meeting with Skon again this week for a short meeting to check-in.
 
 I also did some research on PHP after my presentation on Monday and the discussion that followed. Sam brought up two main points:
 1. The servers run using what language/what is it capable of running
