@@ -1,4 +1,11 @@
 # Journal Entries 
+## Week 2/26
+This week I have completed my C++ connection code and can now move forward with bulding in functions to my "sites" class. Some functions that I will be writing include:
+* Query by site, unit, and time frame
+* Return most recent site data
+* Return site data for the past week
+
+In addition, I met with Matt and Jensen and we agreed that the best output of my query results would be in XML format, so I am not looking into how to return that to the front-end steps.
 ## Week 2/19
 This week I've been focusing on my C++ connection code still. I resolved last week's issue and I am storing all of the query results as one long string. This means that in the upcoming weeks I will need to write code that properly recognizes the seperate pieces of information in the string and formats it in a way that would be useful for Jensen's front-end work and Matt's analysis. I am thinking this will be a vector, but I am meeting with them next Tuesday to discuss some questions such as this. For now, I am using the string. The finished first-draft of the C++ sites file is shown below:
 ```{cpp}
