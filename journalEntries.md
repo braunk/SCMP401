@@ -4,8 +4,61 @@ This week I have completed my C++ connection code and can now move forward with 
 * Query by site, unit, and time frame
 * Return most recent site data
 * Return site data for the past week
+* Most likely more, need to talk with Jensen about her needs for pre-defined queries
 
-In addition, I met with Matt and Jensen and we agreed that the best output of my query results would be in XML format, so I am not looking into how to return that to the front-end steps.
+Now that I have the connection working, I have rebuilt my layout of the classes a little to make site lookups easier for indivdual sites and as a whole over all the sites. The class sites now does not include individual sites name, max watts, number of banks and bank IDs. Instead it includes a vector of "site"s. Each site (a different class) now holds the site data. The Sites class will have the vector of all sites data, plus functions to query by individual sites and for all sites using the funcitons mentioned above.
+
+I have started to work out the most recent site data function and the past week site data as shown below:
+```{cpp}
+string sites::lastWeek(int site,string wattsOrVolts){
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+
+  stmt->execute("SELECT AVG(Response) AS AVG, HOUR(TimeStamp) as HOUR, DAYOFWEEK(TimeStamp) \
+AS DAY FROM `Answers` WHERE IID = '"+allSites[site].getbankIDs()+"' AND QID = '" + wattsOrVo\
+lts +"' AND YEARWEEK (TimeStamp) = YEARWEEK( current_date -interval 1 week ) GROUP BY DAY, H\
+OUR;");
+  std::auto_ptr< sql::ResultSet> res;
+  do{
+    res.reset(stmt->getResultSet());
+    while(res->next()){
+      results=results+res->getString("AVG")+",";
+      results+=res->getString("HOUR")+",";
+      results+=res->getString("DAY")+";";
+    }
+  }while(stmt->getMoreResults());
+
+  return results;
+}
+
+string sites:latest(int sites, string wattsOrVolts){
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+
+  stmt->execute("SELECT Response, TimeStamp FROM `Answers` WHERE IID = '"+allSites[site].get\
+bankIDs()+"' AND QID = '"+wattsOrVolts+"' ORDER BY TimeStamp DESC LIMIT 1;");
+  std::auto_ptr< sql::ResultSet> res;
+  do{
+    res.reset(stmt->getResultSet());
+    while(res->next()){
+      results+=res->getString("Response")+",";
+      results+=res->getString("TimeStamp")+";";
+    }
+  }while(stmt->getMoreResults());
+
+  return results;
+}
+```
+In addition, I met with Matt and Jensen and we agreed that the best output of my query results would be in XML format, so I am not looking into how to return that to the front-end steps. Most likely I will have a string formatted in XML, since creating a new XML document for each new query would just be silly.
+
+Next week I will be looking into XML formatting as well as (hopefully) finishing up my sites functions for querying.
+
 ## Week 2/19
 This week I've been focusing on my C++ connection code still. I resolved last week's issue and I am storing all of the query results as one long string. This means that in the upcoming weeks I will need to write code that properly recognizes the seperate pieces of information in the string and formats it in a way that would be useful for Jensen's front-end work and Matt's analysis. I am thinking this will be a vector, but I am meeting with them next Tuesday to discuss some questions such as this. For now, I am using the string. The finished first-draft of the C++ sites file is shown below:
 ```{cpp}
