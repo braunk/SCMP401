@@ -1,4 +1,165 @@
 # Journal Entries 
+## Week 3/19
+This week I finished the 3 querying functions in my sites class and formatted the output into XML. My sites.cpp file now looks like the following:
+```{cpp}
+#include <vector>
+#include <iostream>
+#include "sites.h"
+#include "mysql_connection.h"
+#include "mysql_driver.h"
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
+
+//declaring all the sites
+//note: is kind of weird at the moment; some are commented out and some of the bank array sizes don't match the number of banks 
+sites::sites(){
+  allSites={logCabins("Log Cabins",2000,2,["A43C8B0C4A","A43C8B0CD7"]),StAndrews("St. Andrews Primary", 1200, 2,["A43C8B0AB1","A43CE7BE69"]),VictNaz("Victorious Nazarene",1200,2,["A43C6DC4\
+D2","A43CE7BE5E"])/*,Kings("Kings College", 800, 1,["A43C6DC5EB"])*/,TolChristian("Toledo Christian Academy", 800, 1,["A43C895C02"]),SanAntonio("San Antonio Primary", 1200, 1,["A43C6DC815"\
+]),FaithNaz("Faith Nazarene", 1200, 1,["A43CE7BE78"])/*,SartenejaNaz("Sarteneja Nazarene", 1200, 1,["A43C6DC4C6"])*/,CorazolMethod("Corazol Methodist", 1200, 1,["A43CE7C04F"]),ACES("ACES",\
+ 1600, 2,["A43C8B0C4C","A43C8B0B9F"]),Brighter("Brighter Tomorrow", 800, 1,["A43CE7BE41"])/*,Kenyon("Kenyon Solar Demo", 600, 1,["A43C6DC810"])*/,Alvin("Alvin Young", 800, 1,["A43C6DC863"]\
+),beloBap("Belopan Baptist High School", 800, 1,["A43CD10AAB"]),NewHorizons("New Horizons High School", 1600, 1,["A43C6DC860,A43C6DC5E5"]),SanPedro("San Pedro High School", 1600, 1,["A43C6\
+DC854","A43C6DC5CC"])};
+}
+
+//user chooses unit, sitenumber and a date/time range to get results for
+string sites::qByID(int sitenum,string wattsOrVolts,string timestamp1, string timestamp2){
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+
+//now formatted in XML
+  results=("<site><name>"+allSites[sitenum].getSiteName()+"</name><maxWatts>"+allSites[sitenum].getMaxWatts()+"</maxWatts><numBanks>"+allSites[sitenum].getNumBanks()+"</numBanks><bank>");
+  //want to make a new <bank> if the site has more than one bank
+  for(int i=0;i<allSites[sitenum].getNumBanks();i++){
+    stmt->execute("SELECT DATE(TimeStamp) AS DAY, HOUR(TimeStamp) as HOUR, AVG(Response) AS AVG FROM `Answers` WHERE IID = '"+allSites[sitenum].getBankIDs(i)+"' AND QID = '" + wattsOrVolts\
+ +"' AND TimeStamp BETWEEN '"+timestamp1+"' AND '"+timestamp2+"' GROUP BY DAY,HOUR;");
+    std::auto_ptr< sql::ResultSet> res;
+
+    string lastDate="";
+    string currentDate="";
+
+    do{
+      res.reset(stmt->getResultSet());
+      while(res->next()){
+        currentDate=res->getString("DAY");
+        //only need to list date once
+        if(lastDate!=currentDate){
+          results+=("<date>"+currentDate+"</date>");
+        }
+        lastDate=currentDate;
+        results+=("<hour>"+res->getString("HOUR")+"</hour>");
+        results+=("<"+wattsOrVolts+">"+res->getString("AVG")+"</"+wattsOrVolts+">");
+  }
+    }while(stmt->getMoreResults());
+    results+="</bank>";
+  }
+  results+="</site>";
+  return results;
+}
+
+//user can query by unit and site number and will get information for the most recent week worth of collected data
+string sites::lastWeek(int sitenum,string wattsOrVolts){
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+
+  results=("<site><name>"+allSites[sitenum].getSiteName()+"</name><maxWatts>"+allSites[sitenum].getMaxWatts()+"</maxWatts><numBanks>"+allSites[sitenum].getNumBanks()+"</numBanks><bank>");
+  for(int i=0;i<allSites[sitenum].getNumBanks();i++){
+    stmt->execute("SELECT DAYOFWEEK(TimeStamp) AS DAY,HOUR(TimeStamp) as HOUR,AVG(Response) AS AVG FROM `Answers` WHERE IID = '"+allSites[sitenum].getbankIDs(i)+"' AND QID = '" + wattsOrVo\
+lts +"' AND YEARWEEK (TimeStamp) = YEARWEEK( current_date -interval 1 week ) GROUP BY DAY, HOUR;");
+
+    std::auto_ptr< sql::ResultSet> res;
+
+    string lastDate="";
+    string currentDate="";
+
+    do{
+      res.reset(stmt->getResultSet());
+      while(res->next()){
+        currentDate=res->getString("DAY");
+        if(lastDate!=currentDate){
+          results+=("<dayofweek>"+currentDate+"</dayofweek>");
+        }
+        lastDate=currentDate;
+        results+=("<hour>"+res->getString("HOUR")+"</hour>");
+        results+=("<"+wattsOrVolts+">"+res->getString("AVG")+"</"+wattsOrVolts+">");
+      }
+    }while(stmt->getMoreResults());
+    results+="</bank>";
+  }
+  results+="</site>";
+
+  return results;
+}
+
+//user will choose a site and unit and the most recent data will be returned
+string sites::latest(int sitenum, string wattsOrVolts){
+  string results="";
+ sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+
+  results=("<site><name>"+allSites[sitenum].getSiteName()+"</name><maxWatts>"+allSites[sitenum].getMaxWatts()+"</maxWatts><numBanks>"+allSites[sitenum].getNumBanks()+"</numBanks><bank>");
+  for(int i=0;i<allSites[sitenum].getNumBanks();i++){
+    stmt->execute("SELECT TimeStamp, Response FROM `Answers` WHERE IID = '"+allSites[sitenum].getbankIDs(i)+"' AND QID = '"+wattsOrVolts+"' ORDER BY TimeStamp DESC LIMIT 1;");
+    std::auto_ptr< sql::ResultSet> res;
+    do{
+      res.reset(stmt->getResultSet());
+      while(res->next()){
+        reults+=("<mostrecent>"+res->getString("TimeStamp")+"</mostrecent>");
+        results+=("<"+wattsOrVolts+">"+res->getString("Response")+"</"+wattsOrVolts+">";
+      }
+    }while(stmt->getMoreResults());
+
+  return results;
+}
+
+//gets most recent data for unit chosen for all sites and banks
+string sites::latestForAll(string wattsOrVolts){
+  string results="";
+  for(int i=0;i<allSites.length();i++){
+     results+=latest(i,wattsOrVolts);
+  }
+  return results;
+}
+```
+Unfortunately I have been having issues compiling this code with my makefile. The errors state that "string" is not a type and that my definition of site.h is incorrect. both errors come from site.h, which is as follows:
+```{cpp}
+#include <stdlib.h>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include<string>
+#include <vector>
+
+#ifendef site_H
+#define site_H
+
+class site{
+ public:
+  site();
+  site(string name,double mxW,int nBanks,string IDs[nBanks]);
+  string getBankIDs(int i);
+  int getNumBanks();
+  double getMaxWatts();
+ private:
+  string sitename;
+  int numBanks;
+  string bankIDs[numBanks];
+  double maxWatts;
+};
+
+#endif
+```
+So I am still trying to figure out what is going wrong with this section of the code. I also added the new sites to the database that were created this Spring break in Belize.
 ## Week 2/26
 This week I have completed my C++ connection code and can now move forward with bulding in functions to my "sites" class. Some functions that I will be writing include:
 * Query by site, unit, and time frame
