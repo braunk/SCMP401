@@ -1,4 +1,7 @@
 # Journal Entries 
+## Week 3/26
+This week I spent most of my time fixing up minor errors along the way. For example, my array of all sites had to be defined by individually pushing in each site. In addition, I had to make sure that everything I was passing to my output was of type string (as some of the site functions I made were passing back doubles/ints instead of strings). Finally, I fixed the makefile and got it working. I then ran into the issue that the functions in my sites were not working for any of the sites I declared. I met with Professor Skon on 4/2 and attempted to resolve these issues and also discussed the prospect of starting on the subtabling.
+
 ## Week 3/19
 This week I finished the 3 querying functions in my sites class and formatted the output into XML. My sites.cpp file now looks like the following:
 ```{cpp}
