@@ -1,4 +1,91 @@
 # Journal Entries 
+## Week 4/2
+Aha! I finally got the connection code running (with a lot of help from professor Skon of course). In the end, a lot of my constructors and deconstructors were not build correctly and the classes were having issues with accessing the vector members outside of where they were build. I've included the sites class constructor and deconstructor from the .cpp file below:
+```{cpp}
+sites::sites(){
+  allSites.reserve(20);
+  //push these in individually
+  allSites.push_back(site("Log Cabins",2000,2,"A43C8B0C4A","A43C8B0CD7"));
+  allSites.push_back(site("St. Andrews Primary", 1200, 2,"A43C8B0AB1","A43CE7BE69"));
+  allSites.push_back(site("Victorious Nazarene",1200,2,"A43C6DC4D2","A43CE7BE5E"));
+  /*,Kings("Kings College", 800, 1,["A43C6DC5EB"])*/
+  allSites.push_back(site("Toledo Christian Academy", 800, 1,"A43C895C02",""));
+  allSites.push_back(site("San Antonio Primary", 1200, 1,"A43C6DC815",""));
+  allSites.push_back(site("Faith Nazarene", 1200, 1,"A43CE7BE78",""));
+  /*,SartenejaNaz("Sarteneja Nazarene", 1200, 1,["A43C6DC4C6"])*/
+  allSites.push_back(site("Corazol Methodist", 1200, 1,"A43CE7C04F",""));
+  allSites.push_back(site("ACES", 1600, 2,"A43C8B0C4C","A43C8B0B9F"));
+  allSites.push_back(site("Brighter Tomorrow", 800, 1,"A43CE7BE41",""));
+  /*,Kenyon("Kenyon Solar Demo", 600, 1,["A43C6DC810"])*/
+  allSites.push_back(site("Alvin Young", 800, 1,"A43C6DC863",""));
+  allSites.push_back(site("Belopan Baptist High School", 800, 1,"A43CD10AAB",""));
+  allSites.push_back(site("New Horizons High School", 1600, 1,"A43C6DC860","A43C6DC5E5"));
+  allSites.push_back(site("San Pedro High School", 1600, 1,"A43C6DC854","A43C6DC5CC"));
+}
+
+sites::~sites(){
+  allSites.clear();
+}
+```
+
+Below is the test program I wrote:
+```{cpp}
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+#include "mysql_connection.h"
+#include "mysql_driver.h"
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
+
+#include "sites.h"
+#include "site.h"
+
+using namespace std;
+
+int main(){
+  sites testsites;
+  cout << "hello!" <<endl;
+  testsites.listSites();
+  cout << "Now outputting the latest wattage for the first site..." << endl;
+  cout << testsites.latest(1,"qWattsMin1") << endl << endl << endl;
+  cout << "Now outputting the last week of wattage data for the first site..." << endl;
+  cout << testsites.lastWeek(1,"qWattsMin1") << endl << endl << endl;
+
+  return 0;
+}
+```
+And this is the output of that:
+```{txt}
+hello!
+13
+Log Cabins:2000:2:A43C8B0C4A:A43C8B0CD7
+St. Andrews Primary:1200:2:A43C8B0AB1:A43CE7BE69
+Victorious Nazarene:1200:2:A43C6DC4D2:A43CE7BE5E
+Toledo Christian Academy:800:1:A43C895C02
+San Antonio Primary:1200:1:A43C6DC815
+Faith Nazarene:1200:1:A43CE7BE78
+Corazol Methodist:1200:1:A43CE7C04F
+ACES:1600:2:A43C8B0C4C:A43C8B0B9F
+Brighter Tomorrow:800:1:A43CE7BE41
+Alvin Young:800:1:A43C6DC863
+Belopan Baptist High School:800:1:A43CD10AAB
+New Horizons High School:1600:1:A43C6DC860
+San Pedro High School:1600:1:A43C6DC854
+Now outputting the latest wattage for the first site...
+<site><name>St. Andrews Primary</name><maxWatts>1200.000000</maxWatts><numBanks>2</numBanks><bank><mostrecent>2018-04-09 18:52:16</mostrecent><qWattsMin1>59</qWattsMin1></bank><bank><mostrecent>2018-04-09 18:52:15</mostrecent><qWattsMin1>31</qWattsMin1></bank></site>
+
+
+Now outputting the last week of wattage data for the first site...
+<site><name>St. Andrews Primary</name><maxWatts>1200.000000</maxWatts><numBanks>2</numBanks><bank><dayofweek>1</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>42.1429</qWattsMin1><hour>9</hour><qWattsMin1>215.1522</qWattsMin1><hour>10</hour><qWattsMin1>326.1538</qWattsMin1><hour>11</hour><qWattsMin1>316.2439</qWattsMin1><hour>12</hour><qWattsMin1>307.5319</qWattsMin1><hour>13</hour><qWattsMin1>375.3953</qWattsMin1><hour>14</hour><qWattsMin1>365.8571</qWattsMin1><hour>15</hour><qWattsMin1>359.1220</qWattsMin1><hour>16</hour><qWattsMin1>340.1837</qWattsMin1><hour>17</hour><qWattsMin1>288.0698</qWattsMin1><hour>18</hour><qWattsMin1>135.9756</qWattsMin1><hour>19</hour><qWattsMin1>19.4151</qWattsMin1><dayofweek>2</dayofweek><hour>7</hour><qWattsMin1>0.0227</qWattsMin1><hour>8</hour><qWattsMin1>58.3438</qWattsMin1><hour>9</hour><qWattsMin1>213.8444</qWattsMin1><hour>10</hour><qWattsMin1>347.9189</qWattsMin1><hour>11</hour><qWattsMin1>337.0571</qWattsMin1><hour>12</hour><qWattsMin1>343.9000</qWattsMin1><hour>13</hour><qWattsMin1>311.9302</qWattsMin1><hour>14</hour><qWattsMin1>367.6316</qWattsMin1><hour>15</hour><qWattsMin1>310.3902</qWattsMin1><hour>16</hour><qWattsMin1>273.9767</qWattsMin1><hour>17</hour><qWattsMin1>227.9032</qWattsMin1><hour>18</hour><qWattsMin1>139.8947</qWattsMin1><hour>19</hour><qWattsMin1>18.0833</qWattsMin1><dayofweek>3</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>25.9535</qWattsMin1><hour>9</hour><qWattsMin1>108.0426</qWattsMin1><hour>10</hour><qWattsMin1>333.4667</qWattsMin1><hour>11</hour><qWattsMin1>379.0303</qWattsMin1><hour>12</hour><qWattsMin1>299.1860</qWattsMin1><hour>13</hour><qWattsMin1>255.9400</qWattsMin1><hour>14</hour><qWattsMin1>327.4167</qWattsMin1><hour>15</hour><qWattsMin1>322.8571</qWattsMin1><hour>16</hour><qWattsMin1>330.1081</qWattsMin1><hour>17</hour><qWattsMin1>247.3000</qWattsMin1><hour>18</hour><qWattsMin1>128.2667</qWattsMin1><hour>19</hour><qWattsMin1>17.8298</qWattsMin1><dayofweek>4</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>9</hour><qWattsMin1>60.2727</qWattsMin1><hour>10</hour><qWattsMin1>205.1373</qWattsMin1><hour>11</hour><qWattsMin1>383.5306</qWattsMin1><hour>12</hour><qWattsMin1>304.8462</qWattsMin1><hour>13</hour><qWattsMin1>340.6000</qWattsMin1><hour>14</hour><qWattsMin1>335.8235</qWattsMin1><hour>15</hour><qWattsMin1>328.8889</qWattsMin1><hour>16</hour><qWattsMin1>293.2500</qWattsMin1><hour>17</hour><qWattsMin1>151.1905</qWattsMin1><hour>18</hour><qWattsMin1>124.2391</qWattsMin1><hour>19</hour><qWattsMin1>12.9767</qWattsMin1><dayofweek>5</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>25.6429</qWattsMin1><hour>9</hour><qWattsMin1>103.0189</qWattsMin1><hour>10</hour><qWattsMin1>262.7692</qWattsMin1><hour>11</hour><qWattsMin1>328.4706</qWattsMin1><hour>12</hour><qWattsMin1>375.6600</qWattsMin1><hour>13</hour><qWattsMin1>356.2200</qWattsMin1><hour>14</hour><qWattsMin1>353.0175</qWattsMin1><hour>15</hour><qWattsMin1>347.1091</qWattsMin1><hour>16</hour><qWattsMin1>320.0000</qWattsMin1><hour>17</hour><qWattsMin1>248.5435</qWattsMin1><hour>18</hour><qWattsMin1>134.5952</qWattsMin1><hour>19</hour><qWattsMin1>13.9063</qWattsMin1><dayofweek>6</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>22.0698</qWattsMin1><hour>9</hour><qWattsMin1>92.5854</qWattsMin1><hour>10</hour><qWattsMin1>240.4651</qWattsMin1><hour>11</hour><qWattsMin1>372.3077</qWattsMin1><hour>12</hour><qWattsMin1>335.6444</qWattsMin1><hour>13</hour><qWattsMin1>324.0889</qWattsMin1><hour>14</hour><qWattsMin1>292.8400</qWattsMin1><hour>15</hour><qWattsMin1>297.1429</qWattsMin1><hour>16</hour><qWattsMin1>285.0833</qWattsMin1><hour>17</hour><qWattsMin1>248.4118</qWattsMin1><hour>18</hour><qWattsMin1>113.7547</qWattsMin1><hour>19</hour><qWattsMin1>14.6444</qWattsMin1><dayofweek>7</dayofweek><hour>7</hour><qWattsMin1>0.1765</qWattsMin1><hour>8</hour><qWattsMin1>25.1892</qWattsMin1><hour>9</hour><qWattsMin1>162.4286</qWattsMin1><hour>10</hour><qWattsMin1>325.7000</qWattsMin1><hour>11</hour><qWattsMin1>368.5429</qWattsMin1><hour>12</hour><qWattsMin1>353.9756</qWattsMin1><hour>13</hour><qWattsMin1>335.1000</qWattsMin1><hour>14</hour><qWattsMin1>311.2500</qWattsMin1><hour>15</hour><qWattsMin1>313.6875</qWattsMin1><hour>16</hour><qWattsMin1>271.3333</qWattsMin1><hour>17</hour><qWattsMin1>197.1304</qWattsMin1><hour>18</hour><qWattsMin1>116.4082</qWattsMin1><hour>19</hour><qWattsMin1>17.1905</qWattsMin1></bank><bank><dayofweek>1</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>19.1071</qWattsMin1><hour>9</hour><qWattsMin1>98.8824</qWattsMin1><hour>10</hour><qWattsMin1>171.5349</qWattsMin1><hour>11</hour><qWattsMin1>177.8000</qWattsMin1><hour>12</hour><qWattsMin1>157.7500</qWattsMin1><hour>13</hour><qWattsMin1>249.1778</qWattsMin1><hour>14</hour><qWattsMin1>230.9592</qWattsMin1><hour>15</hour><qWattsMin1>222.0250</qWattsMin1><hour>16</hour><qWattsMin1>194.1154</qWattsMin1><hour>17</hour><qWattsMin1>153.2245</qWattsMin1><hour>18</hour><qWattsMin1>57.7674</qWattsMin1><hour>19</hour><qWattsMin1>9.1429</qWattsMin1><dayofweek>2</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>25.3429</qWattsMin1><hour>9</hour><qWattsMin1>98.4750</qWattsMin1><hour>10</hour><qWattsMin1>187.7143</qWattsMin1><hour>11</hour><qWattsMin1>212.1951</qWattsMin1><hour>12</hour><qWattsMin1>220.5714</qWattsMin1><hour>13</hour><qWattsMin1>196.6977</qWattsMin1><hour>14</hour><qWattsMin1>235.4595</qWattsMin1><hour>15</hour><qWattsMin1>171.4000</qWattsMin1><hour>16</hour><qWattsMin1>155.8182</qWattsMin1><hour>17</hour><qWattsMin1>113.0313</qWattsMin1><hour>18</hour><qWattsMin1>60.9189</qWattsMin1><hour>19</hour><qWattsMin1>9.3250</qWattsMin1><dayofweek>3</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>11.7778</qWattsMin1><hour>9</hour><qWattsMin1>51.1489</qWattsMin1><hour>10</hour><qWattsMin1>173.3077</qWattsMin1><hour>11</hour><qWattsMin1>221.7500</qWattsMin1><hour>12</hour><qWattsMin1>187.8140</qWattsMin1><hour>13</hour><qWattsMin1>157.3019</qWattsMin1><hour>14</hour><qWattsMin1>202.3200</qWattsMin1><hour>15</hour><qWattsMin1>192.2432</qWattsMin1><hour>16</hour><qWattsMin1>189.8205</qWattsMin1><hour>17</hour><qWattsMin1>122.4000</qWattsMin1><hour>18</hour><qWattsMin1>54.4894</qWattsMin1><hour>19</hour><qWattsMin1>8.2745</qWattsMin1><dayofweek>4</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>0.0000</qWattsMin1><hour>9</hour><qWattsMin1>32.7391</qWattsMin1><hour>10</hour><qWattsMin1>93.1064</qWattsMin1><hour>11</hour><qWattsMin1>220.1250</qWattsMin1><hour>12</hour><qWattsMin1>174.2549</qWattsMin1><hour>13</hour><qWattsMin1>212.5098</qWattsMin1><hour>14</hour><qWattsMin1>211.1111</qWattsMin1><hour>15</hour><qWattsMin1>195.0488</qWattsMin1><hour>16</hour><qWattsMin1>170.7368</qWattsMin1><hour>17</hour><qWattsMin1>68.9286</qWattsMin1><hour>18</hour><qWattsMin1>53.9375</qWattsMin1><hour>19</hour><qWattsMin1>6.5952</qWattsMin1><dayofweek>5</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>13.6207</qWattsMin1><hour>9</hour><qWattsMin1>50.6327</qWattsMin1><hour>10</hour><qWattsMin1>140.0196</qWattsMin1><hour>11</hour><qWattsMin1>194.3725</qWattsMin1><hour>12</hour><qWattsMin1>237.8491</qWattsMin1><hour>13</hour><qWattsMin1>222.7551</qWattsMin1><hour>14</hour><qWattsMin1>230.1200</qWattsMin1><hour>15</hour><qWattsMin1>214.2632</qWattsMin1><hour>16</hour><qWattsMin1>188.5965</qWattsMin1><hour>17</hour><qWattsMin1>129.2553</qWattsMin1><hour>18</hour><qWattsMin1>57.5556</qWattsMin1><hour>19</hour><qWattsMin1>5.5278</qWattsMin1><dayofweek>6</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>9.8605</qWattsMin1><hour>9</hour><qWattsMin1>43.2791</qWattsMin1><hour>10</hour><qWattsMin1>125.9250</qWattsMin1><hour>11</hour><qWattsMin1>221.8000</qWattsMin1><hour>12</hour><qWattsMin1>208.2245</qWattsMin1><hour>13</hour><qWattsMin1>197.6512</qWattsMin1><hour>14</hour><qWattsMin1>164.9800</qWattsMin1><hour>15</hour><qWattsMin1>170.2174</qWattsMin1><hour>16</hour><qWattsMin1>156.8113</qWattsMin1><hour>17</hour><qWattsMin1>129.7073</qWattsMin1><hour>18</hour><qWattsMin1>50.0962</qWattsMin1><hour>19</hour><qWattsMin1>7.5116</qWattsMin1><dayofweek>7</dayofweek><hour>7</hour><qWattsMin1>0.0000</qWattsMin1><hour>8</hour><qWattsMin1>12.9722</qWattsMin1><hour>9</hour><qWattsMin1>78.8913</qWattsMin1><hour>10</hour><qWattsMin1>176.9756</qWattsMin1><hour>11</hour><qWattsMin1>218.3824</qWattsMin1><hour>12</hour><qWattsMin1>217.9143</qWattsMin1><hour>13</hour><qWattsMin1>207.3846</qWattsMin1><hour>14</hour><qWattsMin1>197.3590</qWattsMin1><hour>15</hour><qWattsMin1>192.5263</qWattsMin1><hour>16</hour><qWattsMin1>160.0323</qWattsMin1><hour>17</hour><qWattsMin1>101.8000</qWattsMin1><hour>18</hour><qWattsMin1>51.5714</qWattsMin1><hour>19</hour><qWattsMin1>7.9412</qWattsMin1></bank></site>
+```
+I'm meeting with Professor Skon this week to discuss next steps, hopefully sub-tabling, as well as with Jensen and Matt to some them how to use the code I've prepared.
+
 ## Week 3/26
 This week I spent most of my time fixing up minor errors I've made along the way. For example, my array of all sites had to be defined by individually pushing in each site. In addition, I had to make sure that everything I was passing to my output was of type string (as some of the site functions I made were passing back doubles/ints instead of strings). Finally, I fixed the makefile and got it working. I then ran into the issue that the functions in my sites were not working for any of the sites I declared. I met with Professor Skon on 4/2 and attempted to resolve these issues. After an hour of looking at my code we discovered that for some reason my vector of sites was only taking in one site and then aborting the whole program. We tried many different attempted at discovering how this was happening and how to fix it but with no resolve. We are meeting again next week to discuss this issue again... Lastly, I met with Jensen to discuss the functions I've made and she has requested that I make a fourth function that receives the last 12 hour summaries of data for each site.
 
