@@ -1,4 +1,38 @@
-# Journal Entries 
+# Journal Entries
+## Week 4/9
+This week I've been primarily working out the details of my continued work. That means meeting with Jensen and Matt and Professor Skon. I met with Jensen and Matt separately and walked through how to use my code, as well as sent them both a long, descriptive email for refrence, as follows:
+```{txt}
+Hi guys,
+
+I put all my connection code (2 .h files, 2 .cpp class definition files, .cpp test file, and the makefile) on my github SCMP repository. Here it is: 
+https://github.com/braunk/SCMP401/tree/master
+
+I took out my some of the fields on the sites.h file that might be sensitive (like my username and password) but that part should look as follows:
+#define HOST "cs3.kenyon.edu"
+#define USER "***"
+#define DB "LIM-SERV"
+#define PASS "***"
+so make sure you change that before you try running it. 
+
+Lastly I want to discuss the syntax that you need to use when using the functions. qByID, latest, and lastWeek will all taken in the sites order in the vector. That order can be found in the push_back order in the sites constructor, but I'll list them below anyways:
+0: Log Cabins
+1: St. Andrews Primary
+2: Victorious Nazarene
+3: Toledo Christian Academy
+4: San Antonio Primary
+5: Faith Nazarene
+6: Corazol Methodist
+7: ACES
+8: Brighter Tomorrow
+9: Alvin Young
+10: Belopan Baptist High School
+11: New Horizons High School
+12: San Pedro High School
+Next they taken in if you want the results in watts or volts, which you will write as "qWattsMin1" for watts and "qVoltsMin1" for volts (as shown in the test file). Those are all the passed parameters for the second two functions, but make sure that qByID for timestamp1 and timestamp2, the date is formatted correctly as "yyyy-mm-dd 00:00:00", but I don't think it's written to go down to minute by minute for that, so stick with timestamps that are on the hour (timestamp2 is non-inclusive of the hour you stop it in).
+
+Sorry this is so long and probably and excessive explanation of the code, but I hope that it was helpful. Let me know if you have any questions!
+```
+In addition I met with Skon to discuss the next step of subtabling. We defined the structure of the tables we wanted to add and, in phpmyadmin, I created the two new tables, Sites and Banks. Sites includes only the site name and an unique ID field serving as the primary key. Banks had Bank ID, serving as the primary key, number of panels, and max watts. Banks also had Site ID the corresponded to the site to which it belong and serves as the bridge between the two tables. I also populated the two tables with the bank and site information that I've been using in the vectors I built, as well as information from the website. The idea is to build the vector based off of the sites and bank tables, then continue using the functions as already designed, this way the vector will have the newest information without a doubt. Lastly, I also have been working on putting together my final presentation and reflecting on the work I have done on this project this semester. My next steps to accomplish in the few short weeks left is to edit the connection tcode to account for the new tables I created, as well as do some testing on the speed of the data retrieval.
 ## Week 4/2
 Aha! I finally got the connection code running (with a lot of help from professor Skon of course). In the end, a lot of my constructors and deconstructors were not build correctly and the classes were having issues with accessing the vector members outside of where they were build. I've included the sites class constructor and deconstructor from the .cpp file below:
 ```{cpp}
