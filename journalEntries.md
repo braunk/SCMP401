@@ -32,7 +32,41 @@ Next they taken in if you want the results in watts or volts, which you will wri
 
 Sorry this is so long and probably and excessive explanation of the code, but I hope that it was helpful. Let me know if you have any questions!
 ```
-In addition I met with Skon to discuss the next step of subtabling. We defined the structure of the tables we wanted to add and, in phpmyadmin, I created the two new tables, Sites and Banks. Sites includes only the site name and an unique ID field serving as the primary key. Banks had Bank ID, serving as the primary key, number of panels, and max watts. Banks also had Site ID the corresponded to the site to which it belong and serves as the bridge between the two tables. I also populated the two tables with the bank and site information that I've been using in the vectors I built, as well as information from the website. The idea is to build the vector based off of the sites and bank tables, then continue using the functions as already designed, this way the vector will have the newest information without a doubt. Lastly, I also have been working on putting together my final presentation and reflecting on the work I have done on this project this semester. My next steps to accomplish in the few short weeks left is to edit the connection tcode to account for the new tables I created, as well as do some testing on the speed of the data retrieval.
+In addition I met with Skon to discuss the next step of subtabling. We defined the structure of the tables we wanted to add and, in phpmyadmin, I created the two new tables, Sites and Banks. Sites includes only the site name and an unique ID field serving as the primary key. Banks had Bank ID, serving as the primary key, number of panels, and max watts. Banks also had Site ID the corresponded to the site to which it belong and serves as the bridge between the two tables. I also populated the two tables with the bank and site information that I've been using in the vectors I built, as well as information from the website. The idea is to build the vector based off of the sites and bank tables, then continue using the functions as already designed, this way the vector will have the newest information without a doubt.
+
+Here is some code I have been using to test the connection of the two new subtables:
+```{SQL}
+ SELECT Sites.SiteName, Banks.BankID, Banks.NumPanels, Banks.BankID FROM Sites, Banks WHERE Sites.SiteID=Banks.SiteID;
+ ```
+ And the output:
+ ```{SQL}
+ +------------------------------+------------+-----------+------------+
+| SiteName                     | BankID     | NumPanels | BankID     |
++------------------------------+------------+-----------+------------+
+| Log Cabins                   | A43C8B0C4A |         6 | A43C8B0C4A |
+| Log Cabins                   | A43C8B0CD7 |         6 | A43C8B0CD7 |
+| St. Andrews Primary          | A43C8B0AB1 |         4 | A43C8B0AB1 |
+| St. Andrews Primary          | A43CE7BE69 |         4 | A43CE7BE69 |
+| Victorious Nazarene          | A43C6DC4D2 |         3 | A43C6DC4D2 |
+| Victorious Nazarene          | A43CE7BE5E |         3 | A43CE7BE5E |
+| Kings College                | A43C6DC5EB |         4 | A43C6DC5EB |
+| Toledo Christian Academy     | A43C895C02 |         4 | A43C895C02 |
+| San Antonio Primary          | A43C6DC815 |         6 | A43C6DC815 |
+| Faith Nazarene               | A43CE7BE78 |         6 | A43CE7BE78 |
+| Sarteneja Nazarene           | A43C6DC4C6 |         6 | A43C6DC4C6 |
+| Corazol Methodist            | A43CE7C04F |         4 | A43CE7C04F |
+| ACES                         | A43C8B0B9F |         6 | A43C8B0B9F |
+| ACES                         | A43C8B0C4C |         4 | A43C8B0C4C |
+| Brighter Tomorrow            | A43CE7BE41 |         4 | A43CE7BE41 |
+| Alvin Young                  | A43C6DC863 |         4 | A43C6DC863 |
+| Belmopan Baptist High School | A43CD10AAB |         4 | A43CD10AAB |
+| New Horizons Primary School  | A43C6DC5E5 |         4 | A43C6DC5E5 |
+| New Horizons Primary School  | A43C6DC860 |         4 | A43C6DC860 |
+| San Pedro High School        | A43C6DC5CC |         4 | A43C6DC5CC |
+| San Pedro High School        | A43C6DC854 |         4 | A43C6DC854 |
++------------------------------+------------+-----------+------------+
+```
+Lastly, I also have been working on putting together my final presentation and reflecting on the work I have done on this project this semester. My next steps to accomplish in the few short weeks left is to edit the connection tcode to account for the new tables I created, as well as do some testing on the speed of the data retrieval.
 ## Week 4/2
 Aha! I finally got the connection code running (with a lot of help from professor Skon of course). In the end, a lot of my constructors and deconstructors were not build correctly and the classes were having issues with accessing the vector members outside of where they were build. I've included the sites class constructor and deconstructor from the .cpp file below:
 ```{cpp}
