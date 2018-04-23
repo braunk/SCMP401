@@ -1,4 +1,8 @@
 # Reflections 
+## Presentation 4: Final update
+Last Monday I gave my fourth and final presentation. In this presentation I tried to tie up a lot of what I had been working on in the earlier presentations as well as gather final suggestions from the group on what I should add, if anything, before the end of the semester. Over the past few weeks I finished the connection code complete with the classes, started and finished sub-tabling work, and started on editing the vector in my sites class in order to load directly from the subtables instead of being stagnant in the class. 
+
+
 ## Presentation 3: Mid-way update
 Last Monday I gave my third presentation, an mid-way project update. In this presentation I tried to focus more on walking through my code in order to explain my classes and functions fully. Over the past few weeks I have completed the connection code, and added a lot more complexity to it. 
 
