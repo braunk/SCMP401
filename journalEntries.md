@@ -1,4 +1,42 @@
 # Journal Entries
+## Week 4/16
+This week I edited the constructor in the sites.cpp file to load the site vector from the new tables instead of using the static vector information that I had manually typed earlier in the semester. The changes are in the constructor defined below:
+```{cpp}
+sites::sites(){
+  allSites.reserve(20);
+  //push these in individually
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+  stmt->execute("SELECT Sites.SiteName as SITE, Banks.BankID AS BANKID FROM Sites, Banks WHE\
+RE Sites.SiteID=Banks.SiteID;");
+  std::auto_ptr< sql::ResultSet> res;
+
+  string currentSite="",lastSite="";
+  string bank;
+  site tempsite;
+  do{
+    res.reset(stmt->getResultSet());
+    while(res->next()){
+      currentSite=res->getString("SITE");
+      bank=res->getString("BANKID");
+      if(lastSite==currentSite){
+        tempsite.setBank2(bank);
+      }
+      else{
+        if(tempsite.getSiteName()!=""){
+          allSites.push_back(tempsite);
+        }
+        tempsite=site(currentSite,bank,"");
+      }
+      lastSite=currentSite;
+    }
+  }while(stmt->getMoreResults());
+}
+```
+It was particularly difficult to figure out when/where to push the sites in case there was a site with two banks. The above works for sites with both one or two banks. In addition, I also reconfigured my code to not include max watts per site anymore, because max watts is actually the panel wattage, times the number of panels for that bank, for each bank at the site, and although I have all of that information for the sites, that is a useless calulation because nothing is done with that stat. For now my code is quite slow, so I'm hoping to do some testing on it soon, as well as work out one last function for Jensen.
 ## Week 4/9
 This week I've been primarily working out the details of my continued work. That means meeting with Jensen and Matt and Professor Skon. I met with Jensen and Matt separately and walked through how to use my code, as well as sent them both a long, descriptive email for refrence, as follows:
 ```{txt}
