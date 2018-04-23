@@ -34,6 +34,7 @@ RE Sites.SiteID=Banks.SiteID;");
       lastSite=currentSite;
     }
   }while(stmt->getMoreResults());
+   allSites.push_back(tempsite);
 }
 ```
 It was particularly difficult to figure out when/where to push the sites in case there was a site with two banks. The above works for sites with both one or two banks. In addition, I also reconfigured my code to not include max watts per site anymore, because max watts is actually the panel wattage, times the number of panels for that bank, for each bank at the site, and although I have all of that information for the sites, that is a useless calulation because nothing is done with that stat. For now my code is quite slow, so I'm hoping to do some testing on it soon, as well as work out one last function for Jensen.
