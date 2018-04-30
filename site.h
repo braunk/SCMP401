@@ -18,6 +18,7 @@ class site{
   int getNumBanks();
   double getMaxWatts();
   void display();
+  void setBank2(string b2);
  private:
   string sitename;
   int numBanks;
