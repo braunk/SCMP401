@@ -1,4 +1,6 @@
 # Journal Entries
+## Week 4/23
+This week I added a new function to my sites class that looked up yesterday's data for a site. It was something that Jensen said would be useful to her visualizations. They've been tested in my test functions and mySQL directly, and updated in this project folder in sites.cpp and sites.h. In addition, I updated the rest of my code on GitHub to relfect some changes I've made that would be useful for Matt and Jensen. Lastly, I was informed by Jensen that my lastWeek function was having errors when a day of the week was missing, the error being tags were unmatched. I tried to find a solution for this but all of the loops I tried still caused mismatched tags. I am not sure that there is an easy solution for this, so I might have to inform prof Skon about this potential issue and let him solve it instead.
 ## Week 4/16
 This week I edited the constructor in the sites.cpp file to load the site vector from the new tables instead of using the static vector information that I had manually typed earlier in the semester. The changes are in the constructor defined below:
 ```{cpp}
