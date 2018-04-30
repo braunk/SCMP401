@@ -37,3 +37,7 @@ void site::display() {
   }
   cout << endl;
 }
+
+void site::setBank2(string b2){
+  bankIDs.push_back(b2);
+}
