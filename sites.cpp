@@ -13,22 +13,36 @@
 sites::sites(){
   allSites.reserve(20);
   //push these in individually
-  allSites.push_back(site("Log Cabins",2000,2,"A43C8B0C4A","A43C8B0CD7"));
-  allSites.push_back(site("St. Andrews Primary", 1200, 2,"A43C8B0AB1","A43CE7BE69"));
-  allSites.push_back(site("Victorious Nazarene",1200,2,"A43C6DC4D2","A43CE7BE5E"));
-  /*,Kings("Kings College", 800, 1,["A43C6DC5EB"])*/
-  allSites.push_back(site("Toledo Christian Academy", 800, 1,"A43C895C02",""));
-  allSites.push_back(site("San Antonio Primary", 1200, 1,"A43C6DC815",""));
-  allSites.push_back(site("Faith Nazarene", 1200, 1,"A43CE7BE78",""));
-  /*,SartenejaNaz("Sarteneja Nazarene", 1200, 1,["A43C6DC4C6"])*/
-  allSites.push_back(site("Corazol Methodist", 1200, 1,"A43CE7C04F",""));
-  allSites.push_back(site("ACES", 1600, 2,"A43C8B0C4C","A43C8B0B9F"));
-  allSites.push_back(site("Brighter Tomorrow", 800, 1,"A43CE7BE41",""));
-  /*,Kenyon("Kenyon Solar Demo", 600, 1,["A43C6DC810"])*/
-  allSites.push_back(site("Alvin Young", 800, 1,"A43C6DC863",""));
-  allSites.push_back(site("Belopan Baptist High School", 800, 1,"A43CD10AAB",""));
-  allSites.push_back(site("New Horizons High School", 1600, 1,"A43C6DC860","A43C6DC5E5"));
-  allSites.push_back(site("San Pedro High School", 1600, 1,"A43C6DC854","A43C6DC5CC"));
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+  stmt->execute("SELECT Sites.SiteName as SITE, Banks.BankID AS BANKID FROM Sites, Banks WHE\
+RE Sites.SiteID=Banks.SiteID;");
+  std::auto_ptr< sql::ResultSet> res;
+
+  string currentSite="",lastSite="";
+  string bank;
+  site tempsite;
+  do{
+    res.reset(stmt->getResultSet());
+    while(res->next()){
+      currentSite=res->getString("SITE");
+      bank=res->getString("BANKID");
+      if(lastSite==currentSite){
+        tempsite.setBank2(bank);
+      }
+      else{
+        if(tempsite.getSiteName()!=""){
+          allSites.push_back(tempsite);
+        }
+        tempsite=site(currentSite,bank,"");
+      }
+      lastSite=currentSite;
+    }
+  }while(stmt->getMoreResults());
+   allSites.push_back(tempsite);
 }
 
 sites::~sites(){
@@ -147,6 +161,36 @@ ites[sitenum].getMaxWatts())+"</maxWatts><numBanks>"+to_string(allSites[sitenum]
   results+="</site>";
   return results;
 }
+
+string sites::yesterday(int sitenum, string wattsOrVolts){
+  string results="";
+  sql::Driver* driver = sql::mysql::get_driver_instance();
+  std::auto_ptr<sql::Connection> con(driver->connect(url, user, pass));
+  con->setSchema(database);
+  std::auto_ptr<sql::Statement> stmt(con->createStatement());
+
+  results=("<site><name>"+allSites[sitenum].getSiteName()+"</name>");
+  for(int i=0;i<allSites[sitenum].getNumBanks();i++){
+    results+="<bank>";
+    stmt->execute("SELECT HOUR(TimeStamp) as HOUR,AVG(Response) AS AVG FROM `Answers` WHERE \
+IID = '"+allSites[sitenum].getBankIDs(i)+"' AND QID='"+wattsOrVolts +"' AND YEARWEEK (TimeSt\
+amp) = YEARWEEK( current_date -interval 1 day ) AND (TimeStamp >= DATE_SUB(CURDATE(), INTERV\
+AL 1 DAY) AND TimeStamp < CURDATE()) GROUP BY HOUR;");
+    std::auto_ptr< sql::ResultSet> res;
+    do{
+      res.reset(stmt->getResultSet());
+      while(res->next()){
+        results+=("<hour>" + res->getString("HOUR") + "</hour>");
+        results+=("<"+ wattsOrVolts + ">" + res->getString("AVG") + "</"+ wattsOrVolts + ">"\
+);
+      }
+    }while(stmt->getMoreResults());
+    results+="</bank>";
+  }
+  results+="</site>";
+  return results;
+}
+
 
 string sites::latestForAll(string wattsOrVolts){
   string results="";
