@@ -31,10 +31,10 @@ class sites{
   string qByID(int site, string wattsOrVolts, string timestamp1, string timestamp2);
   string lastWeek(int site, string wattsOrVolts);
   string latest(int site, string wattsOrVolts);
+  string yesterday(int site, string wattsOrVolts);
   //for all sites
   string latestForAll(string wattsOrVolts);
   void listSites();
-
  private:
   vector<site> allSites;
   const string url=HOST;
